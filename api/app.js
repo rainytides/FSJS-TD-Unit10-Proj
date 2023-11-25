@@ -3,6 +3,7 @@
 // Load modules
 const express = require('express');
 const morgan = require('morgan');
+const cors = require('cors'); // Import the cors module
 
 // Import route modules
 const userRoutes = require('./routes/users');
@@ -13,6 +14,9 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 
 // Create the Express app
 const app = express();
+
+// Enable CORS for requests from the React app
+app.use(cors({ origin: 'http://localhost:3000' }));
 
 // Setup request body JSON parsing
 app.use(express.json());
