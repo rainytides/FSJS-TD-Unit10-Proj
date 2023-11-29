@@ -2,29 +2,32 @@ import React, { Component } from 'react';
 import Cookies from 'js-cookie';
 import Data from './Data';
 
-const Context = React.createContext(); 
+const Context = React.createContext();
 
 /**
- * Provider - A Higher-order component (HOC) that manages global state.
+ *  Provider - A Higher-order component (HOC) that manages global state.
  *
  * Stores and provides application-wide state, such as authenticated user details.
  * It also provides actions like signIn and signOut to modify the global state.
  * Uses Cookies to persist authentication state between sessions.
  */
 export class Provider extends Component {
-  state = {
-    authenticatedUser: Cookies.getJSON('authenticatedUser') || null,
-    unhashedPassword: Cookies.getJSON('unhashedPassword') || null,
-  };
-
   constructor() {
     super();
     this.data = new Data();
+    // Attempt to retrieve and parse user data from cookies
+    const cookieUser = Cookies.get('authenticatedUser');
+    const cookiePassword = Cookies.get('unhashedPassword');
+    
+    // Initialize state with either parsed cookie data or null
+    this.state = {
+      authenticatedUser: cookieUser ? JSON.parse(cookieUser) : null,
+      unhashedPassword: cookiePassword ? JSON.parse(cookiePassword) : null,
+    };
   }
 
   render() {
     const { authenticatedUser, unhashedPassword } = this.state;
-
     const value = {
       authenticatedUser,
       unhashedPassword,
@@ -35,40 +38,31 @@ export class Provider extends Component {
       },
     };
 
+    // Render a context provider to supply the global state and actions to the component tree
     return (
       <Context.Provider value={value}>
         {this.props.children}
-      </Context.Provider>  
+      </Context.Provider>
     );
   }
 
-  /**
-   * Signs in the user by setting the state and cookies.
-   *
-   * @param {string} emailAddress - User's email address.
-   * @param {string} password - User's password.
-   * @returns {Object|null} The authenticated user object or null if authentication fails.
-   */
+  // Sign in and update the global state and cookies
   signIn = async (emailAddress, password) => {
     const user = await this.data.getUser(emailAddress, password);
-    
     if (user !== null) {
-      this.setState(() => ({
+      this.setState({
         authenticatedUser: user,
         unhashedPassword: password,
-      }));
+      });
       
+      // Set cookies to persist login state
       Cookies.set('authenticatedUser', JSON.stringify(user), { expires: 1 });
       Cookies.set('unhashedPassword', JSON.stringify(password), { expires: 1 });
     }
-    
     return user;
   };
 
-  /**
-   * Signs out the user by clearing the state and removing cookies.
-   * After sign out, the user cannot access private components.
-   */
+  // Sign out and clear the global state and cookies
   signOut = () => {
     this.setState({ authenticatedUser: null, unhashedPassword: null });
     Cookies.remove('authenticatedUser');
@@ -78,14 +72,7 @@ export class Provider extends Component {
 
 export const Consumer = Context.Consumer;
 
-/**
- * withContext - A Higher-order component that wraps the given component in a Context Consumer.
- *
- * It injects the context into the component, making it available as a prop.
- *
- * @param {Component} Component - The component to be wrapped.
- * @returns {Component} The wrapped component with added context.
- */
+// HOC that wraps a component with the global context, providing it access to global state and actions
 export default function withContext(Component) {
   return function ContextComponent(props) {
     return (
