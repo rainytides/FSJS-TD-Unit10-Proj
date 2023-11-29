@@ -19,7 +19,7 @@ export default function ValidationErrorDisplay(props) {
 /**
  * Helper component to render the actual error messages.
  * 
- * It checks if there are any errors and renders them in a list format.
+ * Checks if there are any errors and renders them in a list format.
  * If there are no errors, it returns null and nothing is rendered.
  * 
  * @param {Object} props - Component properties
