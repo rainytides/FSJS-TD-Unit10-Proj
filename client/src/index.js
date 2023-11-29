@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './styles/.css';
+import './styles/global.css';
 import { Provider } from './Context'; // Context provider for state management
 import App from './App'; // Main app component
 import reportWebVitals from './reportWebVitals'; // Web vitals reporting utility

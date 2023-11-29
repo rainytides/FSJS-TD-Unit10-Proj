@@ -2,40 +2,45 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
 /**
- * Courses - A class component that retrieves and displays all courses.
+ * Courses - A class component for displaying a list of courses.
  *
- * On mount, it fetches the list of courses from the context and sets them
- * in the component's state. If any course is not found, it redirects to the
- * 'notfound' route. In case of any other error, it redirects to the 'error' route.
+ * Fetches course data from the backend on mount and handles rendering
+ * of each course. In case of errors during fetching, handles them appropriately.
  */
 export default class Courses extends Component {
   state = {
-    courses: [],
+    courses: [], // State to store the list of courses
   };
   
   /**
-   * Fetches all courses on component mount and updates the state.
+   * componentDidMount - Lifecycle method to fetch courses after the component mounts.
+   * 
+   * Fetches all courses using the context data method. Updates the state with the courses
+   * data on successful fetch. In case of any errors, logs them and could redirect to 
+   * an error handling route.
    */
   componentDidMount() {
     const { context } = this.props;
     
     context.data.getCourses()
       .then(courses => {
-        if (courses.message) {
-          console.log(courses.message);
-          this.props.history.push('/notfound');
+        if (courses) {
+          this.setState({ courses }); // Update state with fetched courses
         } else {
-          this.setState({ courses });
+          console.log('No courses found'); // Handle the scenario when no courses are found
+          // Optionally redirect to a 'notfound' page or display a message
         }
       })
       .catch(error => {
-        console.log(error);
-        this.props.history.push('/error');
+        console.error('Error fetching courses:', error); // Log any errors that occur during fetch
+        // Redirect to an 'error' route or handle the error
       });
   }
 
   render() {
     const { courses } = this.state;
+
+    // Render each course as a link
     const displayCourses = courses.map(course => 
       <div className='grid-33' key={course.id}>
         <Link className='course--module course--link' to={`/courses/${course.id}`}>
