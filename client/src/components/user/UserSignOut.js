@@ -1,21 +1,21 @@
-import React from 'react';
-import { Redirect } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 
 /**
- * UserSignOut - A functional component to handle user sign-out.
+ * UserSignOut - Component that signs out the user and redirects to the home page.
  *
- * This component triggers the sign-out action and then redirects the user
- * to the default (home) page. It leverages the context for accessing
- * the signOut method defined in the application's context.
+ * When this component is rendered, it executes the sign-out logic provided
+ * through the context and redirects the user to the home page using Navigate.
  *
- * @param {Object} props - Component properties
- * @param {Object} props.context - The application context containing the signOut action
- * @returns {ReactElement} - A Redirect component to navigate to the home page
+ * @param {Object} context - The application context containing the signOut action.
+ * @returns {ReactElement} - A Navigate component that redirects to the home page.
  */
 export default function UserSignOut({ context }) {
-  // Trigger user sign-out
-  context.actions.signOut();
+  // Use the useEffect hook to trigger sign out when the component mounts
+  useEffect(() => {
+    context.actions.signOut();
+  }, [context.actions]);
 
-  // Redirect to the home page
-  return <Redirect to='/' />;
+  // Navigate to the home page after signing out
+  return <Navigate to="/" replace />;
 }
