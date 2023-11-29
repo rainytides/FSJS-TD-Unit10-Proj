@@ -1,24 +1,30 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 
 /**
- * CourseDetail - Class component to retrieve and render a course's details.
- * It also provides options to update and delete the course if the user is authenticated
- * and is the owner of the course.
+ * CourseDetailWrapper - A functional component to utilize React Router hooks.
+ * It extracts the course ID from the URL parameters and passes it to the CourseDetail component.
  */
-export default class CourseDetail extends Component {
+function CourseDetailWrapper(props) {
+  const { id } = useParams(); // Extract the course ID from the URL parameters
+  return <CourseDetail courseId={id} {...props} />; // Pass the courseId as a prop to CourseDetail
+}
+
+/**
+ * CourseDetail - Class component to retrieve and display a course's details.
+ * Handles fetching the course data and rendering details including options
+ * for updating and deleting the course, if the user is authenticated and the owner.
+ */
+class CourseDetail extends Component {
   state = {
     course: '',
     user: ''
   };
 
-  /**
-   * Fetches course details on component mount and updates the state.
-   */
+  // Fetches course details on component mount
   componentDidMount() {
-    const { context } = this.props;
-    const courseId = this.props.match.params.id;
+    const { context, courseId } = this.props;
 
     context.data.getCourse(courseId)
       .then(course => {
@@ -26,10 +32,7 @@ export default class CourseDetail extends Component {
           console.log(course.message);
           this.props.history.push('/notfound');
         } else {
-          this.setState({
-            course,
-            user: course.user
-          });
+          this.setState({ course, user: course.user });
         }
       })
       .catch(error => {
@@ -38,13 +41,10 @@ export default class CourseDetail extends Component {
       });
   }
 
-  /**
-   * Deletes the course and redirects to the main page upon successful deletion.
-   */
+  // Deletes the course and handles redirection
   deleteCourse = () => {
-    const { context } = this.props;
+    const { context, courseId } = this.props;
     const authUser = context.authenticatedUser;
-    const courseId = this.props.match.params.id;
 
     context.data.deleteCourse(courseId, authUser.emailAddress, context.unhashedPassword)
       .then(errors => {
@@ -55,7 +55,7 @@ export default class CourseDetail extends Component {
           this.props.history.push('/');
         }
       })
-      .catch(() => this.props.history.push('/error'));	
+      .catch(() => this.props.history.push('/error'));  
   };
 
   render() {
@@ -118,3 +118,5 @@ export default class CourseDetail extends Component {
     );
   }
 }
+
+export default CourseDetailWrapper; // Export the wrapper function instead of the class component
