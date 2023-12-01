@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ErrorsDisplay from '../ErrorsDisplay';
 
-// Users can create a new course, or display validation errors.
+// Users can create a new course, if they are authenticated.
 export default class CreateCourse extends Component {
 	state ={
 		title: '',
@@ -12,7 +12,7 @@ export default class CreateCourse extends Component {
 		errors: []
 	};
 
-	// Gets the authUser's id to save in state.
+	// Gets the authenticated user's id.
 	componentDidMount() {
 		const { context } = this.props;
 		const authUser = context.authenticatedUser;
@@ -65,11 +65,11 @@ export default class CreateCourse extends Component {
 				} else {
 					console.log(`${title} is successfully added!`);
 					this.props.history.push('/');    
-				};
+				}
 			})
 			.catch((error) => {
 				console.log(error);
-				this.props.history.push('/error')
+				this.props.history.push('/error');
 			});
 	};
 
