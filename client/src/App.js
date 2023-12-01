@@ -1,55 +1,181 @@
-/******************************************
-Treehouse Techdegree:
-FSJS project 10 - Full Stack App with React and a REST API
---aiming for exceeds expectations--
-******************************************/
+import React, { useState, useEffect } from "react";
+import { 
+  BrowserRouter,
+  Routes,
+  Route,
+  redirect
+} from "react-router-dom";
 
-import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { AuthProvider } from "./components/Context";
+import PrivateRoute from "./PrivateRoute";
 
+import Courses from './components/Courses';
+import CourseDetail from './components/CourseDetail';
+import UserSignIn from './components/UserSignIn';
+import UserSignUp from './components/UserSignUp';
+import CreateCourse from './components/CreateCourse';
+import UpdateCourse from './components/UpdateCourse';
 import Header from './components/Header';
-import UserSignUp from './components/user/UserSignUp';
-import UserSignIn from './components/user/UserSignIn';
-import UserSignOut from './components/user/UserSignOut';
-import Courses from './components/course/Courses';
-import CourseDetail from './components/course/CourseDetail';
-import CreateCourse from './components/course/CreateCourse';
-import UpdateCourse from './components/course/UpdateCourse';
-import PrivateRoute from './PrivateRoute';
-import withContext from './Context';
-import Forbidden from './components/Forbidden';
-import NotFound from './components/NotFound';
-import UnhandledError from './components/UnhandledError';
+import UserSignOut from "./components/UserSignOut";
+import NotFound from "./components/NotFound";
+import Forbidden from "./components/Forbidden";
+import UnhandledError from "./components/UnhandledError";
 
-// Connect the components to context.
-const HeaderWithContext = withContext(Header);
-const UserSignUpWithContext = withContext(UserSignUp);
-const UserSignInWithContext = withContext(UserSignIn);
-const UserSignOutWithContext = withContext(UserSignOut);
-const CoursesWithContext = withContext(Courses);
-const CourseDetailWithContext = withContext(CourseDetail);
-const CreateCourseWithContext = withContext(CreateCourse);
-const UpdateCourseWithContext = withContext(UpdateCourse);
+function App() {
+  const [userInfo, updateUserInfo] = useState({}); //Store user info from UserSignUp
 
-export default () => (
-	<Router>
-		<div>
-			<HeaderWithContext />
-			<Switch>
-				<Route exact path='/' component={CoursesWithContext}/>
-				<PrivateRoute exact path='/courses/create' component={CreateCourseWithContext}/>
-				<Route exact path='/courses/:id' component={CourseDetailWithContext}/>
-				<PrivateRoute exact path='/courses/:id/update' component={UpdateCourseWithContext}/>
+  //Global signIn() method constants
+  const userUrl = 'http://localhost:5000/api/users';
+  const [valErrorMsg, updateMsg] = useState([]);
 
-				<Route path='/signup' component={UserSignUpWithContext} />
-				<Route path='/signin' component={UserSignInWithContext} />
-				<Route path='/signout' component={UserSignOutWithContext} />
+  //Global signOut() method
+  const signOut = (userInfo) => {
+    // Remove user info from global state - receives a call with an empty body from the signOut component
+    updateUserInfo(userInfo);
+    //remove user info from local storage
+    localStorage.setItem('emailAddress', '');
+    localStorage.setItem('password', '');
+    localStorage.setItem('firstName', '');
+    localStorage.setItem('lastName', '');
+    localStorage.setItem('id', '');
+  }
 
-				<Route path='/forbidden' component={Forbidden} />
-				<Route path='/error' component={UnhandledError} />
-				<Route path='/notfound' component={NotFound} />
-				<Route component={NotFound} />
-			</Switch>
-		</div>
-	</Router>
-);
+  //Stay signed in with LocalStorage if available - checks if there is any info in local storage, and if so, uses it to set the user info
+  useEffect(() => {
+    if(localStorage.emailAddress) {
+      updateUserInfo({
+        emailAddress: localStorage.emailAddress,
+        password: localStorage.password,
+        firstName: localStorage.firstName,
+        lastName: localStorage.lastName,
+        id: +localStorage.id
+      })
+    };
+  }, [])
+
+  //Global signIn() method - takes email & password args to be used in the authorization header of the signIn GET req
+  const signIn = (emailAddress, password) => {
+    fetch(userUrl, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8", 
+            "Authorization": 'Basic ' + btoa(`${emailAddress}:${password}`)
+        }
+    })
+    .then(res => {
+        if(res.status === 500) {
+            return redirect('/error');
+        } else {
+            return res.json();
+        }
+    })
+    .then(data => {
+        if(data.message) {
+            updateMsg(data.message);
+        } else {
+            //Set data for current user in global state
+            updateUserInfo(data.user);
+            updateUserInfo(prevState => ({...prevState, password: password}));
+            //Use local storage values so that the authenticated state is maintained after refreshes or opening in a new tab
+            localStorage.setItem('emailAddress', data.user.emailAddress);
+            localStorage.setItem('password', password);
+            localStorage.setItem('firstName', data.user.firstName);
+            localStorage.setItem('lastName', data.user.lastName);
+            localStorage.setItem('id', data.user.id);
+        };
+    })
+    .catch((error) => {
+        console.log('Error:', error);
+    });
+  }
+
+  return (
+    <div id="root">
+    <AuthProvider value={userInfo}>
+      <BrowserRouter>
+          <Header />
+          <main>
+            <Routes>
+              <Route
+                path="/"
+                element={<Courses />}
+              />
+
+              <Route 
+                path="courses/:id"
+                element={<CourseDetail />}
+              />
+              
+              {/* https://dev.to/iamandrewluca/private-route-in-react-router-v6-lg5 */}
+              {/* This link shows how to migrate from PrivateRoutes in React Router V.4 to PrivateRoutes in V.6 */}
+              <Route
+                path="courses/create"
+                element={
+                  <PrivateRoute>
+                    <CreateCourse />
+                  </PrivateRoute>
+                }
+              />
+
+              <Route
+                path="courses/:id/update"
+                element={
+                  <PrivateRoute>
+                    <UpdateCourse />
+                  </PrivateRoute>
+                }
+              />
+
+              <Route
+                path="/signup"
+                element={<UserSignUp 
+                  signIn = {signIn}
+                />}
+              />
+
+              <Route
+                path="/signin"
+                element={<UserSignIn 
+                  signIn = {signIn}
+                  userInfo = {userInfo}
+                  valErrorMsg = {valErrorMsg}
+                />}
+              />
+
+              <Route
+                path="/signout"
+                element={<UserSignOut 
+                  signOut = {signOut}
+                />}
+              />
+
+              <Route
+                path="/notfound"
+                element={<NotFound />}
+              />
+
+              <Route
+                path="/forbidden"
+                element={<Forbidden />}
+              />
+
+              <Route
+                path="/error"
+                element={<UnhandledError />}
+              />
+
+              <Route 
+                path="*" 
+                element={<NotFound />}
+              />
+
+            </Routes>
+          </main>
+      </BrowserRouter>
+    </AuthProvider>
+    </div>
+    
+  );
+}
+
+export default App;

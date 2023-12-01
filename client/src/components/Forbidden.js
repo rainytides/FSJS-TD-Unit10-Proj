@@ -1,10 +1,14 @@
-import React from 'react';
+import React from "react";
 
-// Displays a message letting the user know that they can't access the requested page
-// (because they are not authorized to do so).
-export default () => (
-	<div className="bounds">
-		<h1>Forbidden</h1>
-		<p>Uh oh! You can't access this page.</p>
-	</div>
-);
+const Forbidden = () => {
+    return (
+        <main>
+            <div className="wrap">
+                <h2>Forbidden</h2>
+                <p>Oh oh! You can't access this page.</p>
+            </div>
+        </main>
+    );
+}
+
+export default Forbidden;

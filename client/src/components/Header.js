@@ -1,32 +1,41 @@
-import React from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
 
-// Displays the top menu bar for the application and includes buttons for 
-// signing in and signing up (if there's not an authenticated user), 
-// or the user's first and last name and a button for signing out (if there's an authenticated user).
-export default ({ context }) => {
-	const authUser = context.authenticatedUser;
-	
-	return (
-		<div className='header'>
-			<div className='bounds'>
-				<h1 className='header--logo'>
-					<Link id='header' to='/'>Courses</Link>
-				</h1>
-				<nav>
-					{authUser ?
-						<React.Fragment>
-							<span>Welcome, {authUser.firstName} {authUser.lastName}!</span>
-							<NavLink className='signout' to='/signout'>Sign Out</NavLink>
-						</React.Fragment>
-					:
-						<React.Fragment>
-							<NavLink className='signup' to='/signup'>Sign Up</NavLink>
-							<NavLink className='signin' to='/signin'>Sign In</NavLink>
-						</React.Fragment>
-					}
-				</nav>
-			</div>
-		</div>
-	);
+import { AuthConsumer } from "./Context";
+
+
+const Header = () =>{
+    
+    const location = useLocation();
+    
+    return (
+        <header>
+            <div className="wrap header--flex">
+                <h1 className="header--logo"><Link to="/">Courses</Link></h1>
+                <nav>
+                <AuthConsumer>
+                    { context => {
+                        if(context.emailAddress && context.emailAddress !== 'undefined') {
+                            return (
+                                <ul className="header--signedin">
+                                    <li>Welcome, {context.firstName} {context.lastName}!</li>
+                                    <li><Link to="/signout">Sign Out</Link></li>
+                                </ul>
+                            );
+                        } else {
+                            return (
+                                <ul className="header--signedout">
+                                    <li><Link to="/signup">Sign Up</Link></li>
+                                    <li><Link to="/signin" state={{ 'prevLocation': location.pathname }}>Sign In</Link></li>
+                                </ul>
+                            );
+                        }
+                    }}
+                </AuthConsumer>
+                </nav>
+            </div>
+        </header>
+    )
 }
+
+export default Header;

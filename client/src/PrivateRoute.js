@@ -1,25 +1,23 @@
 import React from 'react';
-import { Route, Redirect } from 'react-router-dom';
-import { Consumer } from './Context';
+import { Navigate, useLocation } from 'react-router-dom';
 
-// Higher-order component (HOC) that configures protected routes (the routes that require authentication).
-export default ({ component: Component, ...rest }) => {
-	return (
-		<Consumer>
-			{ context => (
-				<Route
-					{...rest}
-					render={props => context.authenticatedUser ? (
-							<Component {...props} />
-						): (
-							<Redirect to={{
-								pathname: '/signin',
-								state: { from: props.location },
-							}} />
-						)
-					}
-				/>
-			)}
-		</Consumer>
-	);
+import { AuthConsumer } from './components/Context';
+
+const PrivateRoute = ({ children }) => {
+  
+  const location = useLocation();
+
+  //Checks if there is an authenticated user - sends to the requested route('children') if so & to the signIn page if not
+  return (
+    <AuthConsumer>
+      { context => (
+        context.id ? children : <Navigate to="/signin" state={{ 'prevLocation': location.pathname }}/>
+      )}
+    </AuthConsumer>
+  );
 };
+
+export default PrivateRoute;
+
+// https://dev.to/iamandrewluca/private-route-in-react-router-v6-lg5
+// This link shows how to migrate from PrivateRoutes in React Router V.4 to PrivateRoutes in V.6
