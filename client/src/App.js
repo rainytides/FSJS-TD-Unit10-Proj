@@ -31,6 +31,7 @@ const CourseDetailWithContext = withContext(CourseDetail);
 const CreateCourseWithContext = withContext(CreateCourse);
 const UpdateCourseWithContext = withContext(UpdateCourse);
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default () => (
 	<Router>
 		<div>
