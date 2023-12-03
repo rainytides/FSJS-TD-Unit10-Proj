@@ -1,11 +1,12 @@
 /******************************************
 Treehouse Techdegree:
 FSJS project 10 - Full Stack App with React and a REST API
---aiming for exceeds expectations--
 ******************************************/
 
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+
+// Import Components for Routes
 
 import Header from './components/Header';
 import UserSignUp from './components/user/UserSignUp';
@@ -21,7 +22,7 @@ import Forbidden from './components/Forbidden';
 import NotFound from './components/NotFound';
 import UnhandledError from './components/UnhandledError';
 
-// Connect the components to context.
+// Create Components with Context
 const HeaderWithContext = withContext(Header);
 const UserSignUpWithContext = withContext(UserSignUp);
 const UserSignInWithContext = withContext(UserSignIn);
