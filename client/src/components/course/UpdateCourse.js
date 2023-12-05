@@ -51,8 +51,7 @@ export default class UpdateCourse extends Component {
 		});
 	};
 
-	// Updates course's data on submit,
-	// or displays validations errors.
+	// Updates the course with the new data
 	submit = (event) => {
 		event.preventDefault();
 
@@ -89,7 +88,7 @@ export default class UpdateCourse extends Component {
 			});
 	};
 
-	// Redirects user to the course detail route.
+	// Redirects user to the course detail page
 	cancel = (event) => {
 		event.preventDefault();
 		const courseId = this.props.match.params.id;
