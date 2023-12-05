@@ -5,7 +5,7 @@ import Data from './Data';
 const Context = React.createContext(); 
 
 // Higher-order component (HOC) that shares functionality across the components of the app. 
-// This allows reuse of component logic and state.
+// Allows the components to access the context object's data and functionality.
 export class Provider extends Component {
 	state = {
 		authenticatedUser: Cookies.getJSON('authenticatedUser') || null,
@@ -37,7 +37,7 @@ export class Provider extends Component {
 		);
 	};
 
-	// Updates the authenticatedUser and unshashedPassword states upon sign in, and sets cookies.
+	// Retrieves the user from the database and sets the authenticatedUser and unhashedPassword properties in state.
 	signIn = async (emailAddress, password) => {
 		const user = await this.data.getUser(emailAddress, password);
 		
@@ -56,8 +56,7 @@ export class Provider extends Component {
 		return user;
 	};
 
-	// Removes authenticatedUser and unshashedPassword properties from state and removes their cookies.
-	// User is no longer authenticated and cannot view the private components.
+	// Removes the authenticatedUser and unhashedPassword properties from state.
 	signOut = () => {
 		this.setState(() => {
 			return {
@@ -73,7 +72,7 @@ export class Provider extends Component {
 
 export const Consumer = Context.Consumer;
 
-// Higher-order component (HOC) that wraps the provided component in a Context Consumer component.
+// A higher-order component that wraps the provided component in a Context Consumer component.
 export default function withContext(Component) {
 	return function ContextComponent(props) {
 		return (

@@ -1,7 +1,8 @@
 
-// Contains methods used to fetch data from the REST API.
+// Fetches data from the REST API.
 export default class Data {
-	// Makes the requests to the REST API.
+	// --- API --- //
+	// Performs an API call to the REST API
 	api(path, method = 'GET', body = null, requiresAuth = false, credentials = null) {
 		const url = 'http://localhost:5000/api' + path;
 		const options = {
@@ -26,7 +27,7 @@ export default class Data {
 
 	// --- USER DATA --- //
 
-	// GET user credentials from the database.
+	// User's credentials are checked against the database.
 	async getUser(emailAddress, password) {
 		const response = await this.api(`/users`, 'GET', null, true, { emailAddress, password });
 		
@@ -39,7 +40,7 @@ export default class Data {
 		};
 	};
   
-	// POST new user info to the database.
+	// A new user is created in the database.
 	async createUser(user) {
 		const response = await this.api('/users', 'POST', user);
 		
