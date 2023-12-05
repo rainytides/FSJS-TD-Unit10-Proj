@@ -2,104 +2,87 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import ErrorsDisplay from '../ErrorsDisplay';
 
-// Renders a form allowing a user to sign in.
+/**
+ * UserSignIn - A class component for rendering the user sign-in form.
+ * It manages user inputs, sign-in submission, and provides options to cancel or navigate to the sign-up page.
+ */
 export default class UserSignIn extends Component {
-	state = {
-		emailAddress: '',
-		password: '',
-		errors: []
-	}
+  state = {
+    emailAddress: '',
+    password: '',
+    errors: []
+  }
 
-	// Updates state based on user input.
-	change = (event) => {
-		const name = event.target.name;
-		const value = event.target.value;
+  // Handles input changes and updates the component state.
+  change = (event) => {
+    const { name, value } = event.target;
+    this.setState({ [name]: value });
+  };
 
-		this.setState(() => {
-			return {
-				[name]: value
-			};
-		});
-	};
+  // Handles form submission for user sign-in.
+  submit = (event) => {
+    event.preventDefault();
+    const { context, history, location } = this.props;
+    const { from } = location.state || { from: { pathname: '/' } };
+    const { emailAddress, password } = this.state;
+    
+    context.actions.signIn(emailAddress, password)
+      .then(user => {
+        if (!user) {
+          this.setState({ errors: ['Sign-in was unsuccessful.'] });
+        } else {
+          console.log(`${emailAddress} is now signed in!`);
+          history.push(from);
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        history.push('/error');
+      });
+  };
 
-	// Submits the user's credentials to the database.
-	submit = (event) => {
-		event.preventDefault();
+  // Redirects the user to the home page when 'Cancel' is clicked.
+  cancel = (event) => {
+    event.preventDefault();
+    this.props.history.push('/');
+  };
 
-		const { context } = this.props;
-		const { from } = this.props.location.state || { from: { pathname: '/' } };
-		const { 
-			emailAddress, 
-			password 
-		} = this.state;
-		
-		context.actions.signIn(emailAddress, password)
-			.then(user => {
-				if (user === null) {
-					this.setState(() => {
-						return { errors: [ 'Sign-in was unsuccessful.' ] };
-					});
-				} else {
-					console.log(`${emailAddress} is now signed in!`);
-					this.props.history.push(from);
-				}
-			})
-			.catch((error) => {
-				console.log(error);
-				this.props.history.push('/error');
-			})
-	};
+  render() {
+    const { emailAddress, password, errors } = this.state;
 
-	// Redirects the user to the home page.
-	cancel = (event) => {
-		event.preventDefault();
-		this.props.history.push('/');
-	};
-
-	render() {
-		const {
-			emailAddress,
-			password,
-			errors,
-		} = this.state;
-
-		return (
-			<div className='bounds'>
-				<div className='grid-33 centered signin'>
-					<h1>Sign In</h1>
-					<ErrorsDisplay errors={errors} />
-					<div>
-						<form onSubmit={this.submit}>
-							<div>
-								<input 
-									id='emailAddress' 
-									name='emailAddress' 
-									type='text'
-									className=''
-									placeholder='Email Address'
-									value={emailAddress} 
-									onChange={this.change} />
-							</div>
-							<div>
-								<input 
-									id='password' 
-									name='password' 
-									type='password'
-									className=''
-									placeholder='Password'
-									value={password} 
-									onChange={this.change} />
-							</div>
-							<div className='grid-100 pad-bottom'>
-								<button className='button' type='submit'>Sign In</button>
-								<button className='button button-secondary' id='cancel' onClick={this.cancel}>Cancel</button>
-							</div>
-						</form>
-					</div>
-					<p>&nbsp;</p>
-					<p>Don't have a user account? <Link to='/signup'>Click here</Link> to sign up!</p>
-				</div>
-			</div>
-		);
-	};
+    return (
+      <div className='bounds'>
+        <div className='grid-33 centered signin'>
+          <h1>Sign In</h1>
+          <ErrorsDisplay errors={errors} />
+          <form onSubmit={this.submit}>
+            <div>
+              <input 
+                id='emailAddress'
+                name='emailAddress'
+                type='text'
+                placeholder='Email Address'
+                value={emailAddress}
+                onChange={this.change} />
+            </div>
+            <div>
+              <input 
+                id='password'
+                name='password'
+                type='password'
+                placeholder='Password'
+                value={password}
+                onChange={this.change} />
+            </div>
+            <div className='grid-100 pad-bottom'>
+              <button className='button' type='submit'>Sign In</button>
+              <button className='button button-secondary' onClick={this.cancel}>Cancel</button>
+            </div>
+          </form>
+          <p>&nbsp;</p>
+          <p>Don't have a user account? <Link to='/signup'>Click here</Link> to sign up!</p>
+        </div>
+      </div>
+    );
+  }
 }

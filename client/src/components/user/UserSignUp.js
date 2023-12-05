@@ -2,167 +2,91 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import ErrorsDisplay from '../ErrorsDisplay';
 
-// Allows a user to sign up by creating a new account,
-// or displays validations errors.
+/**
+ * UserSignUp - A class component for handling user sign-up.
+ * It allows users to create a new account and handles validation errors.
+ */
 export default class UserSignUp extends Component {
-	state = {
-		firstName: '',
-		lastName: '',
-		emailAddress: '',
-		password: '',
-		confirmPassword: '',
-		errors: [],
-	};
+  state = {
+    firstName: '',
+    lastName: '',
+    emailAddress: '',
+    password: '',
+    confirmPassword: '',
+    errors: [],
+  };
 
-	// Updates state based on user input.
-	change = (event) => {
-		const name = event.target.name;
-		const value = event.target.value;
+  // Handles changes in form inputs and updates state accordingly.
+  change = (event) => {
+    const { name, value } = event.target;
+    this.setState({ [name]: value });
+  };
 
-		this.setState(() => {
-			return {
-				[name]: value
-			};
-		});
-	};
+  // Validates passwords before submitting the form.
+  checkPasswords = (event) => {
+    event.preventDefault();
+    const { password, confirmPassword } = this.state; 
 
-	// Checks that the passwords match before submitting.
-	checkPasswords = (event) => {
-		event.preventDefault();
+    if (password !== confirmPassword) {
+      this.setState({ errors: ['Passwords do not match.'] });
+    } else {
+      this.submit(event);
+    }
+  };
 
-		const {
-			password,
-			confirmPassword,
-		} = this.state; 
+  // Submits the user's data for account creation.
+  submit = (event) => {
+    event.preventDefault();
+    const { context, history } = this.props;
+    const { firstName, lastName, emailAddress, password } = this.state; 
+    const user = { firstName, lastName, emailAddress, password };
 
-		if (password !== confirmPassword) {
-			this.setState({ errors: [ 'Passwords do not match.' ] });
-		} else {
-			this.submit(event);
-		};
-	};
+    context.data.createUser(user)
+      .then(errors => {
+        if (errors.length) {
+          this.setState({ errors });
+        } else {
+          console.log(`${emailAddress} is successfully signed up and authenticated!`);
+          context.actions.signIn(emailAddress, password)
+            .then(() => history.push('/'));
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        history.push('/error');
+      });
+  };
 
-	// Submits the user's credentials to the database.
-	submit = (event) => {
-		event.preventDefault();
+  // Cancels the sign-up and redirects to the home page.
+  cancel = (event) => {
+    event.preventDefault();
+    this.props.history.push('/');
+  };
 
-		const { context } = this.props;
-		const {
-			firstName,
-			lastName,
-			emailAddress,
-			password,
-			confirmPassword,
-		} = this.state; 
-		const user = {
-			firstName,
-			lastName,
-			emailAddress,
-			password,
-			confirmPassword
-		};
+  render() {
+    const { firstName, lastName, emailAddress, password, confirmPassword, errors } = this.state;
 
-		context.data.createUser(user)
-			.then(error => {
-				if (error.length) {
-					this.setState({ errors: error });
-				} else {
-					console.log(`${emailAddress} is successfully signed up and authenticated!`);
-					context.actions.signIn(emailAddress, password)
-						.then(() => {
-							this.props.history.push('/');    
-						});
-				};
-			})
-			.catch((error) => {
-				console.log(error);
-				this.props.history.push('/error')
-			});
-	};
-
-	// Redirects the user to the home page.
-	cancel = (event) => {
-		event.preventDefault();
-		this.props.history.push('/');
-	};
-
-	render() {
-		const {
-			firstName,
-			lastName,
-			emailAddress,
-			password,
-			confirmPassword,
-			errors,
-		} = this.state;
-
-		return (
-			<div className='bounds'>
-				<div className='grid-33 centered signin'>
-					<h1>Sign Up</h1>
-					<ErrorsDisplay errors={errors} />
-					<div>
-						<form onSubmit={this.checkPasswords}>
-							<div>
-								<input 
-									id='firstName' 
-									name='firstName' 
-									type='text'
-									className=''
-									placeholder='First Name'
-									value={firstName} 
-									onChange={this.change} />
-							</div>
-							<div>
-								<input 
-									id='lastName' 
-									name='lastName' 
-									type='text'
-									className=''
-									placeholder='Last Name'
-									value={lastName} 
-									onChange={this.change} />
-							</div>
-							<div>
-								<input 
-									id='emailAddress' 
-									name='emailAddress' 
-									type='text'
-									className=''
-									placeholder='Email Address'
-									value={emailAddress} 
-									onChange={this.change} />
-							</div>
-							<div>
-								<input 
-									id='password' 
-									name='password' 
-									type='password'
-									className=''
-									placeholder='Password'
-									value={password} 
-									onChange={this.change} />
-							</div>
-							<div>
-								<input 
-									id='confirmPassword' 
-									name='confirmPassword' 
-									type='password'
-									className=''
-									placeholder='Confirm Password'
-									value={confirmPassword} 
-									onChange={this.change} />
-							</div>
-							<div className='grid-100 pad-bottom'>
-								<button className='button' type='submit'>Sign Up</button>
-								<button className='button button-secondary' id='cancel' onClick={this.cancel}>Cancel</button>
-							</div>
-						</form>
-					</div>
-					<p>&nbsp;</p>
-					<p>Already have a user account? <Link to='/signin'>Click here</Link> to sign in!</p>
-				</div>
-			</div>
-		);
-	};
+    return (
+      <div className='bounds'>
+        <div className='grid-33 centered signin'>
+          <h1>Sign Up</h1>
+          <ErrorsDisplay errors={errors} />
+          <form onSubmit={this.checkPasswords}>
+            {/* Form fields for user sign-up */}
+            <div><input id='firstName' name='firstName' type='text' placeholder='First Name' value={firstName} onChange={this.change} /></div>
+            <div><input id='lastName' name='lastName' type='text' placeholder='Last Name' value={lastName} onChange={this.change} /></div>
+            <div><input id='emailAddress' name='emailAddress' type='text' placeholder='Email Address' value={emailAddress} onChange={this.change} /></div>
+            <div><input id='password' name='password' type='password' placeholder='Password' value={password} onChange={this.change} /></div>
+            <div><input id='confirmPassword' name='confirmPassword' type='password' placeholder='Confirm Password' value={confirmPassword} onChange={this.change} /></div>
+            <div className='grid-100 pad-bottom'>
+              <button className='button' type='submit'>Sign Up</button>
+              <button className='button button-secondary' onClick={this.cancel}>Cancel</button>
+            </div>
+          </form>
+          <p>&nbsp;</p>
+          <p>Already have a user account? <Link to='/signin'>Click here</Link> to sign in!</p>
+        </div>
+      </div>
+    );
+  }
 }
