@@ -51,42 +51,33 @@ export default class UpdateCourse extends Component {
 		});
 	};
 
-	// Updates the course with the new data
-	submit = (event) => {
-		event.preventDefault();
-
-		const { context } = this.props;
-		const authUser = context.authenticatedUser;
-		const emailAddress = authUser.emailAddress;
-		const password = context.unhashedPassword;
-		const courseId = this.props.match.params.id;
-		const { 
-			title,
-			description,
-			estimatedTime,
-			materialsNeeded
-		} = this.state;
-		const course = {
-			title,
-			description,
-			estimatedTime,
-			materialsNeeded
-		};
-
-		context.data.updateCourse(courseId, course, emailAddress, password)
-			.then(error => {
-				if (error.length) {
-					this.setState({ errors: error });
-				} else {
-					console.log(`${title} has been successfully updated!`);
-					this.props.history.push(`/courses/${courseId}`);  
-				};
-			})
-			.catch((error) => {
-				console.log(error);
-				this.props.history.push('/error')
-			});
-	};
+// Updates the course with the new data
+submit = (event) => {
+	event.preventDefault();
+  
+	const { context } = this.props;
+	const authUser = context.authenticatedUser;
+	const emailAddress = authUser.emailAddress;
+	const password = context.unhashedPassword;
+	const courseId = this.props.match.params.id;
+	const { title, description, estimatedTime, materialsNeeded } = this.state;
+	const course = { title, description, estimatedTime, materialsNeeded };
+  
+	context.data.updateCourse(courseId, course, emailAddress, password)
+	  .then(error => {
+		if (error.length) {
+		  this.setState({ errors: error });
+		} else {
+		  console.log(`${title} has been successfully updated!`);
+		  this.props.history.push(`/courses/${courseId}`);
+		}
+	  })
+	  .catch((error) => {
+		console.log(error);
+		this.setState({ errors: ['An unexpected error occurred.'] });
+	  });
+  };
+  
 
 	// Redirects user to the course detail page
 	cancel = (event) => {

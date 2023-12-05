@@ -34,28 +34,28 @@ export default class UserSignUp extends Component {
     }
   };
 
-  // Submits the user's data for account creation.
-  submit = (event) => {
-    event.preventDefault();
-    const { context, history } = this.props;
-    const { firstName, lastName, emailAddress, password } = this.state; 
-    const user = { firstName, lastName, emailAddress, password };
+// Submits the user's data for account creation.
+submit = (event) => {
+  event.preventDefault();
+  const { context, history } = this.props;
+  const { firstName, lastName, emailAddress, password } = this.state; 
+  const user = { firstName, lastName, emailAddress, password };
 
-    context.data.createUser(user)
-      .then(errors => {
-        if (errors.length) {
-          this.setState({ errors });
-        } else {
-          console.log(`${emailAddress} is successfully signed up and authenticated!`);
-          context.actions.signIn(emailAddress, password)
-            .then(() => history.push('/'));
-        }
-      })
-      .catch(error => {
-        console.log(error);
-        history.push('/error');
-      });
-  };
+  context.data.createUser(user)
+    .then(errors => {
+      if (errors.length) {
+        this.setState({ errors });
+      } else {
+        console.log(`${emailAddress} is successfully signed up and authenticated!`);
+        context.actions.signIn(emailAddress, password)
+          .then(() => history.push('/'));
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      this.setState({ errors: ['An unexpected error occurred.'] });
+    });
+};
 
   // Cancels the sign-up and redirects to the home page.
   cancel = (event) => {
