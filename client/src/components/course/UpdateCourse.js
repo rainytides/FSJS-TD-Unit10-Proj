@@ -74,7 +74,7 @@ submit = (event) => {
 	  })
 	  .catch((error) => {
 		console.log(error);
-		this.setState({ errors: ['An unexpected error occurred.'] });
+		this.setState({ errors: ['A required field has been left blank.'] });
 	  });
   };
   

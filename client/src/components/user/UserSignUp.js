@@ -53,7 +53,7 @@ submit = (event) => {
     })
     .catch(error => {
       console.log(error);
-      this.setState({ errors: ['An unexpected error occurred.'] });
+      this.setState({ errors: ['Every field is like a puzzle piece - essential and needed for the complete picture. Please fill in all the fields! 🧩✨'] });
     });
 };
 
