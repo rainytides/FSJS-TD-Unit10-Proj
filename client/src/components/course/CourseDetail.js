@@ -2,16 +2,14 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 
-// Retrieves and renders a course's details.
-// Only renders the Update and Delete buttons if there's an authenticated user,
-// and the authenticated user's ID matches that of the user who owns the course.
+// Renders the course details page
 export default class CourseDetail extends Component {
 	state ={
 		course: '',
 		user: ''
 	};
 	
-	// Gets the specific course's details to save in state.
+	// Gets the course details
 	componentDidMount() {
 		const { context } = this.props;
 		const courseId = this.props.match.params.id;
@@ -34,7 +32,7 @@ export default class CourseDetail extends Component {
 			});
 	};
 
-	// Deletes course data from the database.
+	// Deletes the course
 	deleteCourse = () => {
 		const { context } = this.props;
 		const authUser = context.authenticatedUser;

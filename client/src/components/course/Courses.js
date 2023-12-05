@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-// Retrieves and renders all courses.
+// Retrieves all courses and renders them
 export default class Courses extends Component {
 	state ={
 		courses: [],
 	};
 	
-	// Gets all course data to save in state.
+	// Gets all courses
 	componentDidMount() {
 		const { context } = this.props;
 		

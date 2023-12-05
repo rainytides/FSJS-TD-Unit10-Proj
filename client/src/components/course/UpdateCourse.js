@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import ErrorsDisplay from '../ErrorsDisplay';
 
-// Retrieves course's details and updates any changes made by user.
-// If user is not the owner of the course, user is redirected to the forbidden route.
+// Allows the user to update a course if they are the owner
 export default class UpdateCourse extends Component {
 	state ={
 		title: '',
@@ -12,7 +11,7 @@ export default class UpdateCourse extends Component {
 		errors: []
 	};
 	
-	// Gets the specific course's details to save in state.
+	// Saves the course's data to state
 	componentDidMount() {
 		const { context } = this.props;
 		const courseId = this.props.match.params.id;
@@ -40,7 +39,7 @@ export default class UpdateCourse extends Component {
 			});
 	};
 
-	// Saves input data to state.
+	// Saves user input to state
 	change = (event) => {
 		const name = event.target.name;
 		const value = event.target.value;

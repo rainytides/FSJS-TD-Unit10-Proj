@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ErrorsDisplay from '../ErrorsDisplay';
 
-// Allows user to create a new course, if user is signed in and authenticated.
+// Allows the user to create a new course
 export default class CreateCourse extends Component {
 	state ={
 		title: '',
@@ -12,7 +12,7 @@ export default class CreateCourse extends Component {
 		errors: []
 	};
 
-	// Gets the authUser's id to save in state.
+	// Gets the user id if user is signed in and authenticated
 	componentDidMount() {
 		const { context } = this.props;
 		const authUser = context.authenticatedUser;
@@ -22,7 +22,7 @@ export default class CreateCourse extends Component {
 		});
 	};
 
-	// Saves input data to state.
+	// Updates state with user input
 	change = (event) => {
 		const name = event.target.name;
 		const value = event.target.value;
@@ -34,8 +34,7 @@ export default class CreateCourse extends Component {
 		});
 	};
 
-	// Saves new course data to database on submit,
-	// or displays validations errors.
+	// Creates a new course
 	submit = (event) => {
 		event.preventDefault();
 
@@ -73,7 +72,7 @@ export default class CreateCourse extends Component {
 			});
 	};
 
-	// Redirects user to the default route.
+	// Redirects user to the home page
 	cancel = (event) => {
 		event.preventDefault();
 		this.props.history.push('/');
