@@ -14,7 +14,7 @@ export default class UserSignUp extends Component {
 		errors: [],
 	};
 
-	// Saves input data to state.
+	// Updates state based on user input.
 	change = (event) => {
 		const name = event.target.name;
 		const value = event.target.value;
@@ -26,7 +26,7 @@ export default class UserSignUp extends Component {
 		});
 	};
 
-	// Checks if password and confirmPassword inputs match before submitting.
+	// Checks that the passwords match before submitting.
 	checkPasswords = (event) => {
 		event.preventDefault();
 
@@ -42,7 +42,7 @@ export default class UserSignUp extends Component {
 		};
 	};
 
-	// Saves new user data to database on submit.
+	// Submits the user's credentials to the database.
 	submit = (event) => {
 		event.preventDefault();
 
@@ -80,7 +80,7 @@ export default class UserSignUp extends Component {
 			});
 	};
 
-	// Redirects user to the default route.
+	// Redirects the user to the home page.
 	cancel = (event) => {
 		event.preventDefault();
 		this.props.history.push('/');
